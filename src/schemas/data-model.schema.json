@@ -1,0 +1,331 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodeForge Data Model Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the data model"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the data model"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the data model"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Entity"
+      },
+      "minItems": 1,
+      "description": "List of entities in the data model"
+    },
+    "enums": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EnumDefinition"
+      },
+      "description": "List of enum definitions"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata for the data model"
+    }
+  },
+  "required": ["name", "version", "entities"],
+  "definitions": {
+    "Entity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][a-zA-Z0-9]*$",
+          "description": "Entity name in PascalCase"
+        },
+        "tableName": {
+          "type": "string",
+          "description": "Custom table name (optional)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Entity description"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityField"
+          },
+          "minItems": 1,
+          "description": "List of entity fields"
+        },
+        "indexes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Index"
+          },
+          "description": "Database indexes"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Constraint"
+          },
+          "description": "Database constraints"
+        },
+        "timestamps": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include createdAt and updatedAt fields"
+        },
+        "softDelete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable soft delete functionality"
+        }
+      },
+      "required": ["name", "fields"]
+    },
+    "EntityField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$",
+          "description": "Field name in camelCase"
+        },
+        "dataType": {
+          "$ref": "#/definitions/DataType"
+        },
+        "relationship": {
+          "$ref": "#/definitions/Relationship"
+        },
+        "isPrimaryKey": {
+          "type": "boolean",
+          "default": false
+        },
+        "isUnique": {
+          "type": "boolean",
+          "default": false
+        },
+        "isIndexed": {
+          "type": "boolean",
+          "default": false
+        },
+        "isGenerated": {
+          "type": "boolean",
+          "default": false
+        },
+        "generationStrategy": {
+          "type": "string",
+          "enum": ["uuid", "increment", "timestamp"]
+        }
+      },
+      "required": ["name", "dataType"]
+    },
+    "DataType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "date", "array", "object", "enum"]
+        },
+        "format": {
+          "type": "string",
+          "enum": ["email", "url", "uuid", "date", "datetime", "time", "int32", "int64", "float", "double", "binary"]
+        },
+        "items": {
+          "$ref": "#/definitions/DataType"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/DataType"
+          }
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
+        "nullable": {
+          "type": "boolean",
+          "default": false
+        },
+        "default": {
+          "description": "Default value for the field"
+        },
+        "description": {
+          "type": "string"
+        },
+        "validation": {
+          "$ref": "#/definitions/ValidationRules"
+        }
+      },
+      "required": ["type"]
+    },
+    "ValidationRules": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "email": {
+          "type": "boolean"
+        },
+        "url": {
+          "type": "boolean"
+        },
+        "uuid": {
+          "type": "boolean"
+        },
+        "custom": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Relationship": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["oneToOne", "oneToMany", "manyToOne", "manyToMany"]
+        },
+        "target": {
+          "type": "string",
+          "description": "Target entity name"
+        },
+        "foreignKey": {
+          "type": "string",
+          "description": "Foreign key field name"
+        },
+        "joinTable": {
+          "type": "string",
+          "description": "Join table name for many-to-many relationships"
+        },
+        "cascade": {
+          "type": "boolean",
+          "default": false
+        },
+        "eager": {
+          "type": "boolean",
+          "default": false
+        },
+        "onDelete": {
+          "type": "string",
+          "enum": ["CASCADE", "SET NULL", "RESTRICT"],
+          "default": "RESTRICT"
+        }
+      },
+      "required": ["type", "target"]
+    },
+    "Index": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "unique": {
+          "type": "boolean",
+          "default": false
+        },
+        "type": {
+          "type": "string",
+          "enum": ["btree", "hash", "gin", "gist"],
+          "default": "btree"
+        }
+      },
+      "required": ["name", "fields"]
+    },
+    "Constraint": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["check", "unique", "foreignKey"]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "expression": {
+          "type": "string"
+        },
+        "references": {
+          "type": "object",
+          "properties": {
+            "table": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["table", "fields"]
+        }
+      },
+      "required": ["name", "type", "fields"]
+    },
+    "EnumDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "values"]
+    }
+  }
+}

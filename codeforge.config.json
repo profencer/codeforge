@@ -1,0 +1,30 @@
+{
+  "project": {
+    "name": "BlogAPI",
+    "description": "Blog platform API generated with CodeForge",
+    "version": "1.0.0",
+    "author": "CodeForge User"
+  },
+  "database": {
+    "type": "postgresql",
+    "host": "localhost",
+    "port": 5432,
+    "database": "blog_db"
+  },
+  "features": {
+    "authentication": true,
+    "authorization": true,
+    "swagger": true,
+    "asyncapi": false,
+    "docker": true,
+    "testing": true,
+    "logging": true,
+    "monitoring": false
+  },
+  "generation": {
+    "outputDir": "generated",
+    "templateDir": "templates",
+    "overwrite": false,
+    "backup": true
+  }
+}

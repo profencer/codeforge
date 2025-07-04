@@ -1,0 +1,151 @@
+{
+  "name": "BlogAPI",
+  "version": "1.0.0",
+  "description": "A simple blog API data model",
+  "entities": [
+    {
+      "name": "User",
+      "description": "User entity for authentication and authorization",
+      "fields": [
+        {
+          "name": "id",
+          "dataType": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isPrimaryKey": true,
+          "isGenerated": true,
+          "generationStrategy": "uuid"
+        },
+        {
+          "name": "email",
+          "dataType": {
+            "type": "string",
+            "format": "email",
+            "validation": {
+              "email": true
+            }
+          },
+          "isUnique": true
+        },
+        {
+          "name": "name",
+          "dataType": {
+            "type": "string",
+            "validation": {
+              "minLength": 2,
+              "maxLength": 100
+            }
+          }
+        },
+        {
+          "name": "role",
+          "dataType": {
+            "type": "enum",
+            "enum": [
+              "UserRole"
+            ]
+          }
+        },
+        {
+          "name": "posts",
+          "dataType": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "relationship": {
+            "type": "oneToMany",
+            "target": "Post",
+            "foreignKey": "authorId"
+          }
+        }
+      ],
+      "timestamps": true
+    },
+    {
+      "name": "Post",
+      "description": "Blog post entity",
+      "fields": [
+        {
+          "name": "id",
+          "dataType": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isPrimaryKey": true,
+          "isGenerated": true,
+          "generationStrategy": "uuid"
+        },
+        {
+          "name": "title",
+          "dataType": {
+            "type": "string",
+            "validation": {
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        },
+        {
+          "name": "content",
+          "dataType": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "published",
+          "dataType": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        {
+          "name": "authorId",
+          "dataType": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "author",
+          "dataType": {
+            "type": "object"
+          },
+          "relationship": {
+            "type": "manyToOne",
+            "target": "User",
+            "foreignKey": "authorId"
+          }
+        }
+      ],
+      "timestamps": true,
+      "indexes": [
+        {
+          "name": "idx_post_author",
+          "fields": [
+            "authorId"
+          ]
+        },
+        {
+          "name": "idx_post_published",
+          "fields": [
+            "published"
+          ]
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "UserRole",
+      "values": [
+        "ADMIN",
+        "USER",
+        "MODERATOR"
+      ],
+      "description": "User roles for authorization"
+    }
+  ]
+}
