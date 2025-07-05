@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const fs = require('fs');
+
+// Get the directory where this script is located
+const binDir = __dirname;
+const rootDir = path.dirname(binDir);
+const cliPath = path.join(rootDir, 'dist', 'cli', 'index.js');
+
+// Check if the CLI file exists
+if (!fs.existsSync(cliPath)) {
+  console.error('❌ CodeForge CLI not found. Please run "npm run build" first.');
+  console.error(`Expected CLI at: ${cliPath}`);
+  process.exit(1);
+}
+
+// Execute the CLI
+require(cliPath);

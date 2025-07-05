@@ -4,16 +4,22 @@
   "description": "A code-first service for generating API specifications and scaffolding NestJS backends",
   "main": "dist/index.js",
   "bin": {
-    "codeforge": "dist/cli/index.js"
+    "codeforge": "./bin/codeforge"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-schemas",
+    "copy-schemas": "mkdir -p dist/schemas && cp src/schemas/*.json dist/schemas/",
     "dev": "ts-node src/cli/index.ts",
     "start": "node dist/cli/index.js",
+    "codeforge": "./bin/codeforge",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "install-global": "npm run build && npm install -g .",
+    "uninstall-global": "npm uninstall -g codeforge",
+    "link": "npm run build && npm link",
+    "unlink": "npm unlink"
   },
   "keywords": [
     "code-generation",

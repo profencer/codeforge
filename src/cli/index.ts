@@ -143,28 +143,18 @@ program
     await infoCommand.execute(options);
   });
 
-// Error handling
-program.exitOverride();
-
+// Error handling for async commands
 process.on('uncaughtException', (error) => {
   console.error(chalk.red.bold('✗ Uncaught Exception:'));
   console.error(chalk.red(error.message));
-  if (program.opts().verbose) {
-    console.error(chalk.gray(error.stack));
-  }
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   console.error(chalk.red.bold('✗ Unhandled Rejection:'));
-  console.error(chalk.red(reason));
-  if (program.opts().verbose) {
-    console.error(chalk.gray(promise));
-  }
+  console.error(chalk.red(String(reason)));
   process.exit(1);
 });
 
 // Parse command line arguments
-if (require.main === module) {
-  program.parse();
-}
+program.parse();
